@@ -1,6 +1,10 @@
+require 'pry'
 class Auth::SessionsController < ApplicationController
 	
 	def create
+		
+		binding.pry
+		
 		if params[:token].present?
 			@user = User.find_by(confirmation_token: params[:token])
 			start_session = new_with_token
@@ -11,7 +15,7 @@ class Auth::SessionsController < ApplicationController
 		end
 		
 		if start_session
-      start_update_tweet_cron
+      #start_update_tweet_cron
 			render json: @user.as_json(only: [:email, :authentication_token]), status: :created
 		else
 			head(:unauthorized)
@@ -40,15 +44,15 @@ class Auth::SessionsController < ApplicationController
 			end
 		end
     
-    def start_update_tweet_cron
-      cron_hash = {'update_tweets' => {
-                    'class' => 'UpdateTweetsWorker',
-                    'cron' => '0 * * * * *',
-                    'args' => [@user.id]
-                    }
-                  }
-      
-      Sidekiq::Cron::Job.load_from_hash(cron_hash)
-    end
+    #def start_update_tweet_cron
+    #  cron_hash = {'update_tweets' => {
+    #                'class' => 'UpdateTweetsWorker',
+    #                'cron' => '0 * * * * *',
+    #                'args' => [@user.id]
+    #                }
+    #              }
+    #  
+    #  Sidekiq::Cron::Job.load_from_hash(cron_hash)
+    #end
 	
 end
